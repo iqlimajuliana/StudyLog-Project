@@ -45,7 +45,7 @@ class StudyLogApp(ctk.CTk):
         self.members = [
             TeamMember("Maulana Abdillahul Fattah", "2417051055", "Ilmu Komputer", "Designed the main interface and visual consistency."),
             TeamMember("Iqlima Juliana", "2417051048", "Ilmu Komputer", "Implemented data handling and attendance logic."),
-            TeamMember("Rizka Aprilia", "2417051056", "Ilmu Komputer", "Developed layout using CTk."),
+            TeamMember("Rizka Aprilia", "2417051066", "Ilmu Komputer", "Developed layout using CTk."),
             TeamMember("Kirana Aditya Moza", "2417051058", "Ilmu Komputer", "Managed project timeline and delivery."),
         ]
 
