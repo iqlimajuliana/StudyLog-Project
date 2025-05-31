@@ -2,6 +2,31 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 import customtkinter as ctk
+
+# Setup awal
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
+class TeamMember:
+    def __init__(self, name, npm,  bio):
+        self.name = name
+        self.npm = npm
+        self.photo_path = "LOGO STUDYLOG.jpg"
+        self.study_program = "Ilmu Komputer"
+        self.bio = bio
+
+class MemberPage(ctk.CTkFrame):
+    def __init__(self, master, member: TeamMember, back_callback):
+        super().__init__(master, fg_color="#eef3fc")
+        self.member = member
+        self.back_callback = back_callback
+
+        img = Image.open(self.member.photo_path).resize((160, 160))
+        self.photo = ImageTk.PhotoImage(img)
+
+        tk.Label(self, image=self.photo, bg="#eef3fc").pack(pady=(40, 10))
+        ctk.CTkLabel(self, text=self.member.name, font=ctk.CTkFont(size=20, weight="bold"), text_color="#6b72c9").pack()
+        ctk.CTkLabel(self, text=self.member.npm, font=ctk.CTkFont(size=14), text_color="#000000").pack(pady=(0, 20))
 #==========================rizka==========================
 
 #========================================================================iqlima===================================================================================
