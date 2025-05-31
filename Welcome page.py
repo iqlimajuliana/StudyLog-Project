@@ -28,11 +28,11 @@ class MemberPage(ctk.CTkFrame):
         ctk.CTkLabel(self, text=self.member.name, font=ctk.CTkFont(size=20, weight="bold"), text_color="#6b72c9").pack()
         ctk.CTkLabel(self, text=self.member.npm, font=ctk.CTkFont(size=14), text_color="#000000").pack(pady=(0, 20))
 #==========================rizka==========================
-ctk.CTkLabel(self, text=f"Study Program: \n{self.member.study_program}", font=ctk.CTkFont(size=13),
+        ctk.CTkLabel(self, text=f"Study Program: \n{self.member.study_program}", font=ctk.CTkFont(size=13),
                      text_color="#000000", justify="center").pack(pady=(0, 10))
-ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
+        ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
                      text_color="#333333", wraplength=320, justify="center").pack(pady=(0, 20))
-ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
+        ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
 
 
 class StudyLogApp(ctk.CTk):
