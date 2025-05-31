@@ -30,9 +30,9 @@ class MemberPage(ctk.CTkFrame):
 #==========================rizka==========================
 ctk.CTkLabel(self, text=f"Study Program: \n{self.member.study_program}", font=ctk.CTkFont(size=13),
                      text_color="#000000", justify="center").pack(pady=(0, 10))
-        ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
+ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
                      text_color="#333333", wraplength=320, justify="center").pack(pady=(0, 20))
-        ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
+ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
 
 
 class StudyLogApp(ctk.CTk):
