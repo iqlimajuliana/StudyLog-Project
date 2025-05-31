@@ -28,7 +28,30 @@ class MemberPage(ctk.CTkFrame):
         ctk.CTkLabel(self, text=self.member.name, font=ctk.CTkFont(size=20, weight="bold"), text_color="#6b72c9").pack()
         ctk.CTkLabel(self, text=self.member.npm, font=ctk.CTkFont(size=14), text_color="#000000").pack(pady=(0, 20))
 #==========================rizka==========================
+ctk.CTkLabel(self, text=f"Study Program: \n{self.member.study_program}", font=ctk.CTkFont(size=13),
+                     text_color="#000000", justify="center").pack(pady=(0, 10))
+        ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
+                     text_color="#333333", wraplength=320, justify="center").pack(pady=(0, 20))
+        ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
 
+
+class StudyLogApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("StudyLog")
+        self.geometry("400x600")
+        self.configure(fg_color="#eef3fc")
+
+        self.members = [
+            TeamMember("Maulana Abdillahul Fattah", "2417051055", "Ilmu Komputer", "Designed the main interface and visual consistency."),
+            TeamMember("Iqlima Juliana", "2417051048", "Ilmu Komputer", "Implemented data handling and attendance logic."),
+            TeamMember("Rizka Aprilia", "2417051056", "Ilmu Komputer", "Developed layout using CTk."),
+            TeamMember("Kirana Aditya Moza", "2417051058", "Ilmu Komputer", "Managed project timeline and delivery."),
+        ]
+
+        self.frames = {}
+        self.create_home()
+        self.create_team()
 #========================================================================iqlima===================================================================================
 self.create_member_pages()
         self.show_frame("home")
