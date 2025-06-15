@@ -1,120 +1,103 @@
 #==========================kirana========================
-import tkinter as tk
-from PIL import Image, ImageTk
 import customtkinter as ctk
+from tkinter import messagebox
+from PIL import Image, ImageTk
+from controller import *
+from datetime import datetime
 
-# Setup awal
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
-class TeamMember:
-    def __init__(self, name, npm,  bio):
-        self.name = name
-        self.npm = npm
-        self.photo_path = "LOGO STUDYLOG.jpg"
-        self.study_program = "Ilmu Komputer"
-        self.bio = bio
+class StudyLogApp:
+    def __init__(self, root):  
+        self.root = root
+        self.root.title("StudyLog")
+        self.root.geometry("1000x700")
+        self.root.minsize(900, 650)
+        init_csv_files()
+        self.absen_stack = []
+        self.create_welcome_page()
 
-class MemberPage(ctk.CTkFrame):
-    def __init__(self, master, member: TeamMember, back_callback):
-        super().__init__(master, fg_color="#eef3fc")
-        self.member = member
-        self.back_callback = back_callback
+    def clear_frame(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-        img = Image.open(self.member.photo_path).resize((160, 160))
-        self.photo = ImageTk.PhotoImage(img)
+    def create_welcome_page(self):
+        self.clear_frame()
+        left = ctk.CTkFrame(self.root, fg_color='white', width=500, corner_radius=0)
+        right = ctk.CTkFrame(self.root, fg_color='#0b355d', width=500, corner_radius=0)
+        left.pack(side='left', fill='both', expand=True)
+        right.pack(side='right', fill='both', expand=True)
 
-        tk.Label(self, image=self.photo, bg="#eef3fc").pack(pady=(40, 10))
-        ctk.CTkLabel(self, text=self.member.name, font=ctk.CTkFont(size=20, weight="bold"), text_color="#6b72c9").pack()
-        ctk.CTkLabel(self, text=self.member.npm, font=ctk.CTkFont(size=14), text_color="#000000").pack(pady=(0, 20))
-#==========================rizka==========================
-        ctk.CTkLabel(self, text=f"Study Program: \n{self.member.study_program}", font=ctk.CTkFont(size=13),
-                     text_color="#000000", justify="center").pack(pady=(0, 10))
-        ctk.CTkLabel(self, text=self.member.bio, font=ctk.CTkFont(size=12),
-                     text_color="#333333", wraplength=320, justify="center").pack(pady=(0, 20))
-        ctk.CTkButton(self, text="Back to Team", command=self.back_callback, width=150, height=40).pack(pady=20)
+        logo_img = Image.open("asset/STUDY LOG.png").resize((260, 260))
+        logo_img = ImageTk.PhotoImage(logo_img)
+        logo = ctk.CTkLabel(left, image=logo_img, text="", bg_color='white')
+        logo.image = logo_img
+        logo.place(relx=0.5, rely=0.30, anchor='center')
 
+        ctk.CTkLabel(left, text="Welcome to", font=ctk.CTkFont(size=26, weight="bold"), text_color="#0b355d").place(relx=0.5, rely=0.52, anchor='center')
+        ctk.CTkLabel(left, text="StudyLog", font=ctk.CTkFont(size=48, weight="bold", slant="italic"), text_color="#0b355d").place(relx=0.5, rely=0.60, anchor='center')
 
-class StudyLogApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
-        self.title("StudyLog")
-        self.geometry("400x600")
-        self.configure(fg_color="#eef3fc")
+        ctk.CTkButton(
+            right, text="Start", width=300, height=60, corner_radius=30,
+            command=self.create_login_page, fg_color="#b5d0e6", text_color="#0b355d",
+            font=ctk.CTkFont(size=20, weight="bold")
+        ).place(relx=0.5, rely=0.4, anchor='center')
+        ctk.CTkButton(
+            right, text="Our Team", width=300, height=60, corner_radius=30,
+            command=self.create_team_page, fg_color="#b5d0e6", text_color="#0b355d",
+            font=ctk.CTkFont(size=20, weight="bold")
+        ).place(relx=0.5, rely=0.55, anchor='center')
 
-        self.members = [
-            TeamMember("Maulana Abdillahul Fattah", "2417051055", "Ilmu Komputer", "Designed the main interface and visual consistency."),
-            TeamMember("Iqlima Juliana", "2417051048", "Ilmu Komputer", "Implemented data handling and attendance logic."),
-            TeamMember("Rizka Aprilia", "2417051066", "Ilmu Komputer", "Developed layout using CTk."),
-            TeamMember("Kirana Aditya Moza", "2417051058", "Ilmu Komputer", "Managed project timeline and delivery."),
+    def create_team_page(self):
+        self.clear_frame()
+        container = ctk.CTkFrame(self.root, fg_color="white")
+        container.pack(fill='both', expand=True)
+
+        header = ctk.CTkFrame(container, fg_color='#0b355d', height=70, corner_radius=0)
+        header.pack(fill='x')
+        logo_img = Image.open("asset/STUDY LOG.png").resize((65, 65))
+        logo_img = ImageTk.PhotoImage(logo_img)
+        logo_label = ctk.CTkLabel(header, image=logo_img, text="")
+        logo_label.image = logo_img
+        logo_label.pack(side="left", padx=10, pady=7)
+        ctk.CTkLabel(header, text="StudyLog", font=ctk.CTkFont(size=24, weight="bold"), text_color="white").pack(side="left", padx=8)
+        ctk.CTkButton(header, text="Back", width=120, height=44, corner_radius=18,
+                      command=self.create_welcome_page, fg_color="#b5d0e6", text_color="#0b355d",
+                      font=ctk.CTkFont(size=16, weight="bold")).pack(side="right", padx=24)
+
+        ctk.CTkLabel(container, text="Our Team", font=ctk.CTkFont(size=32, weight="bold"), text_color="#0b355d").pack(pady=30)
+
+        grid = ctk.CTkFrame(container, fg_color='white', width=900, height=550)
+        grid.pack(expand=True)
+        grid.pack_propagate(False)
+
+        team_data = [
+            ("Iqlima Juliana", "2417051048", "ima.jpg"),
+            ("Maulana Abdillahul F.", "2417051055", "maul.jpg"),
+            ("Kirana Aditya M.", "2417051057", "kirana.jpg"),
+            ("Rizka Aprilia", "2417051066", "rizka.jpg")
         ]
 
-        self.frames = {}
-        self.create_home()
-        self.create_team()
+        card_width, card_height = 340, 220
+        for i, (nama, npm, foto) in enumerate(team_data):
+            card = ctk.CTkFrame(grid, width=card_width, height=card_height, fg_color="#b5d0e6", corner_radius=40)
+            card.place(x=(i % 2) * (card_width + 60) + 60, y=(i // 2) * (card_height + 40) + 20)
+            card.pack_propagate(False)
+            try:
+                img = Image.open(f"asset/{foto}").resize((200, 170))
+                photo = ImageTk.PhotoImage(img)
+                img_label = ctk.CTkLabel(card, image=photo, text="")
+                img_label.image = photo
+                img_label.pack(pady=0)
+            except:
+                ctk.CTkLabel(card, text="(Foto)", text_color="#0b355d", font=ctk.CTkFont(size=14, weight="bold")).pack(pady=20)
+
+            ctk.CTkLabel(card, text=nama, font=ctk.CTkFont(size=18, weight="bold"), text_color="#0b355d").pack(pady=(12, 0))
+            ctk.CTkLabel(card, text=npm, font=ctk.CTkFont(size=16), text_color="#0b355d").pack()
+
+#==========================rizka==========================
+        
 #========================================================================iqlima===================================================================================
-self.create_member_pages()
-        self.show_frame("home")
-
-    def show_frame(self, name):
-        for f in self.frames.values():
-            f.pack_forget()
-        self.frames[name].pack(fill="both", expand=True)
-
-    def create_home(self):
-        frame = ctk.CTkFrame(self, fg_color="#eef3fc")
-        self.frames["home"] = frame
-
-        container = ctk.CTkFrame(frame, fg_color="transparent")
-        container.pack(fill="both", expand=True)
-
-        logo_img = Image.open("LOGO STUDYLOG.jpg").resize((140, 140))
-        self.logo_photo = ImageTk.PhotoImage(logo_img)
-        tk.Label(container, image=self.logo_photo, bg="#eef3fc").pack(pady=(40, 10))
-
-        ctk.CTkLabel(container, text="StudyLog", font=ctk.CTkFont(size=30, weight="bold"),
-                     text_color="#6b72c9").pack()
-        ctk.CTkLabel(container, text="Your smart class\nattendance tracker",
-                     font=ctk.CTkFont(size=14), text_color="#000000").pack(pady=(5, 50))
 
 #================================================================maul=========================================================================================
-spacer = ctk.CTkFrame(container, fg_color="transparent")
-        spacer.pack(expand=True)
-
-        btn_frame = ctk.CTkFrame(container, fg_color="transparent")
-        btn_frame.pack(pady=(0, 30))
-
-        ctk.CTkButton(btn_frame, text="Start Now", width=120, corner_radius=20).grid(row=0, column=0, padx=10)
-        ctk.CTkButton(btn_frame, text="See Our Team", width=120, corner_radius=20,
-                      command=lambda: self.show_frame("team")).grid(row=0, column=1, padx=10)
-
-    def create_team(self):
-        frame = ctk.CTkFrame(self, fg_color="#eef3fc")
-        self.frames["team"] = frame
-
-        ctk.CTkLabel(frame, text="OUR TEAM", font=ctk.CTkFont(size=20, weight="bold"), text_color="#6b72c9").pack(pady=(30, 20))
-
-        for member in self.members:
-            member_card = ctk.CTkFrame(frame, width=300, height=60, corner_radius=10)
-            member_card.pack(pady=5)
-
-            img = Image.open(member.photo_path).resize((35, 35))
-            member.icon = ImageTk.PhotoImage(img)
-            tk.Label(member_card, image=member.icon, bg="#E1E6F9").pack(side="left", padx=10)
-
-            text = f"{member.name}\n{member.npm}"
-            ctk.CTkButton(member_card, text=text, anchor="w", fg_color="#6b72c9",
-                          command=lambda m=member.name: self.show_frame(m),
-                          width=200, height=50, corner_radius=10).pack(side="left", padx=5)
-
-        ctk.CTkButton(frame, text="Back to Home", width=200, height=40, corner_radius=20,
-                      command=lambda: self.show_frame("home")).pack(pady=30)
-
-    def create_member_pages(self):
-        for member in self.members:
-            self.frames[member.name] = MemberPage(self, member, back_callback=lambda: self.show_frame("team"))
-
-
-if __name__ == "__main__":
-    app = StudyLogApp()
-    app.mainloop()
