@@ -312,6 +312,11 @@ class StudyLogApp:
             self.combo_matkul.set(matkul_list[0])
         else:
             self.combo_matkul.set("")
+            
+    def show_scoreboard(self):
+        self.clear_frame()
+        ScoreboardApp(self.root, controller=self).pack(fill="both", expand=True)
+
 
 class ScoreboardApp(ctk.CTkFrame):
     def __init__(self, master, controller=None):
@@ -476,5 +481,5 @@ class ScoreboardApp(ctk.CTkFrame):
 
 if __name__ == "__main__":
     root = ctk.CTk()
-    app = ScoreboardApp(root)
-    app.mainloop()
+    app = StudyLogApp(root)
+    root.mainloop()
