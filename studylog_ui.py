@@ -167,3 +167,148 @@ class StudyLogApp:
             self.create_absen_page()
         else:
             messagebox.showerror("Login Gagal", "Nama, NPM, atau Password salah.")
+    def create_absen_page(self):
+        self.clear_frame()
+        header = ctk.CTkFrame(self.root, fg_color='#0b355d', height=60, corner_radius=0)
+        header.pack(fill='x')
+
+        logo_img = Image.open("asset/STUDY LOG.png").resize((50, 50))
+        logo_img = ImageTk.PhotoImage(logo_img)
+        logo_label = ctk.CTkLabel(header, image=logo_img, text="")
+        logo_label.image = logo_img
+        logo_label.pack(side="left", padx=16, pady=7)
+
+        ctk.CTkLabel(header, text="StudyLog", font=ctk.CTkFont(size=22, weight="bold"), text_color="white").pack(side="left")
+        ctk.CTkButton(
+            header, text="Log Out", width=120, height=40, corner_radius=14,
+            command=self.show_scoreboard,
+            fg_color="#b5d0e6", text_color="#0b355d",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(side="right", padx=26)
+
+        left = ctk.CTkFrame(self.root, fg_color='white', width=340, corner_radius=0)
+        right = ctk.CTkFrame(self.root, fg_color='white', corner_radius=0)
+        left.pack(side='left', fill='y')
+        right.pack(side='right', fill='both', expand=True)
+
+        form = ctk.CTkFrame(left, fg_color="#e1ecf4", corner_radius=18)
+        form.pack(pady=18, padx=12)
+        form.pack_propagate(False)
+        form.configure(width=310, height=520)
+
+        ctk.CTkLabel(form, text="StudyLog", font=ctk.CTkFont(size=22, weight="bold"), text_color="#0b355d").pack(pady=(12, 6))
+
+        ctk.CTkLabel(form, text="Mata Kuliah", text_color="#0b355d", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=10, pady=(6,0))
+        self.combo_matkul = ctk.CTkComboBox(form, values=MATA_KULIAH, corner_radius=7, width=250, font=ctk.CTkFont(size=14))
+        self.combo_matkul.pack(padx=10, pady=4)
+
+        ctk.CTkLabel(form, text="Hari", text_color="#0b355d", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=10, pady=(6,0))
+        self.combo_hari = ctk.CTkComboBox(form, values=["Senin", "Selasa", "Rabu", "Kamis", "Jumat"], corner_radius=7, width=250, font=ctk.CTkFont(size=14))
+        self.combo_hari.pack(padx=10, pady=4)
+
+        ctk.CTkLabel(form, text="Tanggal", text_color="#0b355d", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=10, pady=(6,0))
+        self.entry_tanggal = ctk.CTkEntry(form, placeholder_text="dd/mm/2025", width=250, font=ctk.CTkFont(size=14))
+        self.entry_tanggal.pack(padx=10, pady=4)
+        self.entry_tanggal.bind("<FocusOut>", self.update_hari_dan_matkul)
+        self.entry_tanggal.bind("<Return>", self.update_hari_dan_matkul)
+
+        self.entry_jam = self.labeled_entry(form, "Jam")
+
+        btn_frame = ctk.CTkFrame(form, fg_color='#e1ecf4')
+        btn_frame.pack(pady=18, fill="x", expand=True)
+
+        for i in range(2):
+            btn_frame.grid_rowconfigure(i, weight=1)
+            btn_frame.grid_columnconfigure(i, weight=1)
+
+        for i, status in enumerate(["Hadir", "Alpha", "Sakit", "Izin"]):
+            ctk.CTkButton(
+                btn_frame, text=status, width=120, height=60, corner_radius=18,
+                fg_color="#0b355d", text_color='white',
+                font=ctk.CTkFont(size=16, weight="bold"),
+                command=lambda s=status: self.submit_absen(s)
+            ).grid(row=i//2, column=i%2, padx=16, pady=16, sticky="nsew")
+
+        self.summary_frame = right
+        self.update_absen_summary()
+
+    def submit_absen(self, status):
+        matkul = self.combo_matkul.get()
+        hari = self.combo_hari.get()
+        jam = self.entry_jam.get()
+        tanggal = self.entry_tanggal.get()
+        nama, npm = self.current_user
+
+        if not all([matkul, hari, jam, tanggal]):
+            messagebox.showerror("Error", "Semua field harus diisi")
+            return
+
+        try:
+            tgl_obj = datetime.strptime(tanggal, "%d/%m/%Y")
+            if tgl_obj.year != 2025:
+                messagebox.showerror("Tahun Salah", "Tahun harus 2025")
+                return
+        except ValueError:
+            messagebox.showerror("Format Salah", "Format tanggal harus dd/mm/2025")
+            return
+
+        try:
+            jam_obj = datetime.strptime(jam, "%H:%M")
+        except ValueError:
+            messagebox.showerror("Format Salah", "Format jam harus jj:jj (24 jam, contoh 08:30)")
+            return
+
+        if matkul in self.absen_stack:
+            messagebox.showwarning(
+                "Sudah Absen",
+                "Anda sudah absen di mata kuliah ini."
+            )
+            return
+
+        if is_already_absent(nama, npm, matkul, tanggal):
+            messagebox.showwarning(
+                "Absensi Ganda",
+                f"Anda sudah melakukan absensi untuk mata kuliah '{matkul}' pada tanggal {tanggal}."
+            )
+            return
+
+        save_absen(nama, npm, matkul, hari, jam, tanggal, status)
+        self.absen_stack.append(matkul)
+        messagebox.showinfo("Absensi Berhasil", f"Absensi untuk mata kuliah '{matkul}' pada tanggal {tanggal} berhasil disimpan.")
+        self.update_absen_summary()
+
+    def update_absen_summary(self):
+        for widget in self.summary_frame.winfo_children():
+            widget.destroy()
+
+        nama, npm = self.current_user
+        count, total = get_absen_summary(nama, npm)
+
+        grid = ctk.CTkFrame(self.summary_frame, fg_color='white', width=400)
+        grid.pack(padx=18, pady=36, anchor='n')
+        grid.pack_propagate(False)
+
+        card_width, card_height = 370, 64
+        for i, mk in enumerate(MATA_KULIAH):
+            row, col = i // 2, i % 2
+            card = ctk.CTkFrame(grid, width=card_width, height=card_height, fg_color="#b5d0e6", corner_radius=18)
+            card.grid(row=row, column=col, padx=18, pady=14)
+            card.pack_propagate(False)
+
+            absen_box = ctk.CTkFrame(card, width=70, height=36, fg_color='white', corner_radius=18)
+            absen_box.place(relx=1.0, rely=0.5, x=-22, anchor='e')
+            absen_box.pack_propagate(False)
+            ctk.CTkLabel(absen_box, text=f"{count[mk]}/{total[mk]}", text_color="#0b355d", font=ctk.CTkFont(size=16, weight="bold")).pack(expand=True)
+
+            ctk.CTkLabel(card, text=mk, font=ctk.CTkFont(size=15, weight="bold"), text_color="#0b355d", anchor='w').place(x=22, rely=0.5, anchor='w')
+
+    def update_hari_dan_matkul(self, event=None):
+        tanggal = self.entry_tanggal.get()
+        hari = get_hari_from_tanggal(tanggal)
+        self.combo_hari.set(hari)
+        matkul_list = get_matkul_from_hari(hari)
+        self.combo_matkul.configure(values=matkul_list)
+        if matkul_list:
+            self.combo_matkul.set(matkul_list[0])
+        else:
+            self.combo_matkul.set("")
