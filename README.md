@@ -5,6 +5,7 @@ Fitur:
 Navigasi utama aplikasi.
 Tombol Start untuk masuk ke halaman login.
 Tombol Our Team untuk melihat profil tim pengembang.
+
 UI:
 Desain modern dua panel, logo, judul aplikasi, dan tombol navigasi yang jelas.
 
@@ -12,6 +13,7 @@ Desain modern dua panel, logo, judul aplikasi, dan tombol navigasi yang jelas.
 Fitur:
 Menampilkan profil anggota tim (nama, NPM, foto).
 Tombol Back untuk kembali ke halaman utama.
+
 UI:
 Kartu profil (card) dengan foto, nama, dan NPM.
 
@@ -19,6 +21,7 @@ Kartu profil (card) dengan foto, nama, dan NPM.
 Fitur:
 Form login dengan validasi Nama, NPM, dan Password.
 Tombol login dan info "forgot password".
+
 UI:
 Dua panel: branding/deskripsi aplikasi dan form login.
 
@@ -28,6 +31,7 @@ Form absensi: pilih mata kuliah, hari, tanggal, jam, dan status (Hadir, Alpha, S
 Validasi input absensi (tidak bisa absen dua kali, format tanggal/jam, dsb).
 Ringkasan absensi: progress kehadiran tiap mata kuliah.
 Tombol Log Out.
+
 UI:
 Header dengan logo dan nama aplikasi.
 Panel kiri: form absensi dengan tombol status besar.
