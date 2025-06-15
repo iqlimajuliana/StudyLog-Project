@@ -38,6 +38,8 @@ Panel kiri: form absensi dengan tombol status besar.
 Panel kanan: ringkasan absensi dalam bentuk card/progress.
 
 ✨ Keunggulan StudyLog
-UI modern dan responsif (customtkinter).
-Navigasi antar halaman mudah dan jelas.
-Visualisasi data absensi yang informatif.
+-UI modern dan responsif (customtkinter).
+
+-Navigasi antar halaman mudah dan jelas.
+
+-Visualisasi data absensi yang informatif.
