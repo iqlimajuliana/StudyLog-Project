@@ -1,4 +1,3 @@
-#==========================kirana========================
 import customtkinter as ctk
 from tkinter import messagebox
 from PIL import Image, ImageTk
@@ -95,9 +94,76 @@ class StudyLogApp:
 
             ctk.CTkLabel(card, text=nama, font=ctk.CTkFont(size=18, weight="bold"), text_color="#0b355d").pack(pady=(12, 0))
             ctk.CTkLabel(card, text=npm, font=ctk.CTkFont(size=16), text_color="#0b355d").pack()
+            
+    def create_login_page(self):
+        self.clear_frame()
+        left = ctk.CTkFrame(self.root, fg_color='white', width=500, corner_radius=0)
+        right = ctk.CTkFrame(self.root, fg_color='#0b355d', width=500, corner_radius=0)
+        left.pack(side='left', fill='both', expand=True)
+        right.pack(side='right', fill='both', expand=True)
 
-#==========================rizka==========================
-        
-#========================================================================iqlima===================================================================================
+        logo_img = Image.open("asset/STUDY LOG.png").resize((300, 300))
+        logo_img = ImageTk.PhotoImage(logo_img)
+        logo_label = ctk.CTkLabel(left, image=logo_img, text="")
+        logo_label.image = logo_img
+        logo_label.place(relx=0.5, rely=0.25, anchor='center')
 
-#================================================================maul=========================================================================================
+        ctk.CTkLabel(left, text="StudyLog", font=ctk.CTkFont(size=36, weight="bold", slant="italic"), text_color="#0b355d").place(relx=0.5, rely=0.48, anchor='center')
+        ctk.CTkLabel(left, text="Attendance Tracker", text_color="#0b355d", font=ctk.CTkFont(size=24, weight="bold")).place(relx=0.5, rely=0.56, anchor='center')
+        ctk.CTkLabel(
+            left,
+            text="Aplikasi absensi digital yang mencatat kehadiran\nsecara otomatis dan efisien.\nSetiap kali hadir, skor keaktifan akan bertambah.\nAplikasi ini sederhana, efisien, dan mudah digunakan.",
+            text_color="#0b355d", font=ctk.CTkFont(size=13), justify="center"
+        ).place(relx=0.5, rely=0.65, anchor='center')
+
+        form = ctk.CTkFrame(right, fg_color="white", corner_radius=18)
+        form.place(relx=0.5, rely=0.5, anchor='center')
+        form.pack_propagate(False)
+        form.configure(width=340, height=340)
+
+        self.nama_entry = self.styled_entry(form, "Nama")
+        self.npm_entry = self.styled_entry(form, "NPM")
+        self.pass_entry = self.styled_entry(form, "Password", show='*')
+
+        ctk.CTkButton(
+            form, text="Login", command=self.login_user, corner_radius=14, width=240,
+            fg_color="#b5d0e6", text_color="#0b355d", font=ctk.CTkFont(size=18, weight="bold")
+        ).pack(pady=(22, 6))
+
+        ctk.CTkLabel(
+            form, text="forgot password?", font=ctk.CTkFont(size=11), text_color='#0b355d'
+        ).pack(pady=(0, 10))
+
+    def styled_entry(self, parent, label, show=None):
+        ctk.CTkLabel(parent, text=label, text_color='#0b355d', anchor='w', font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=12, pady=(10,0))
+        entry = ctk.CTkEntry(parent, show=show, corner_radius=7, width=250, font=ctk.CTkFont(size=14))
+        entry.pack(padx=12, pady=7)
+        return entry
+
+    def labeled_entry(self, parent, label):
+        ctk.CTkLabel(parent, text=label, text_color='#0b355d', font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=12, pady=(10,0))
+        entry = ctk.CTkEntry(parent, corner_radius=7, width=250, font=ctk.CTkFont(size=14))
+        entry.pack(padx=12, pady=7)
+        return entry
+
+    def labeled_combobox(self, parent, label, values):
+        ctk.CTkLabel(parent, text=label, text_color="#0b355d", font=ctk.CTkFont(size=14, weight="bold")).pack(anchor='w', padx=24)
+        combo = ctk.CTkComboBox(parent, values=values, corner_radius=7, width=270, font=ctk.CTkFont(size=14))
+        combo.pack(pady=10)
+        return combo
+
+    def login_user(self):
+        nama = self.nama_entry.get()
+        npm = self.npm_entry.get()
+        password = self.pass_entry.get()
+
+        if not all([nama, npm, password]):
+            messagebox.showerror("Error", "Semua field harus diisi")
+            return
+
+        if verify_or_register_user(nama, npm, password):
+            self.current_user = (nama, npm)
+            messagebox.showinfo("Login Berhasil", f"Selamat datang, {nama}!")
+            self.create_absen_page()
+        else:
+            messagebox.showerror("Login Gagal", "Nama, NPM, atau Password salah.")
