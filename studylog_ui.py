@@ -312,3 +312,169 @@ class StudyLogApp:
             self.combo_matkul.set(matkul_list[0])
         else:
             self.combo_matkul.set("")
+
+class ScoreboardApp(ctk.CTkFrame):
+    def __init__(self, master, controller=None):
+        super().__init__(master)
+        self.controller = controller
+        self.time_left = 10
+        self.timer_running = False
+        self.ao_score = 0
+        self.aka_score = 0
+
+        self.theme = {
+            "bg": "#121212",
+            "fg": "#00ffcc",
+            "ao_bg": "#004080",
+            "aka_bg": "#800000",
+            "timer_bg": "#000000",
+            "timer_fg": "#32cd32",
+            "btn_bg": "#00ffcc",
+            "btn_fg": "#121212",
+            "btn_active_bg": "#00cca3",
+            "font": ("Poppins", 14, "bold"),
+        }
+
+        self.configure(fg_color=self.theme["bg"])
+        self.pack(fill="both", expand=True)
+
+        self.outer_frame = ctk.CTkFrame(self, fg_color=self.theme["bg"])
+        self.outer_frame.pack(expand=True, fill="both", padx=20, pady=20)
+
+        ctk.CTkLabel(
+            self.outer_frame, text="Scoreboard",
+            font=ctk.CTkFont(size=28, weight="bold"),
+            text_color=self.theme["fg"], fg_color=self.theme["bg"]
+        ).grid(row=0, column=0, columnspan=5, pady=(0, 20))
+
+        ctk.CTkLabel(
+            self.outer_frame, text="Team AO:",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme["fg"], fg_color=self.theme["bg"]
+        ).grid(row=1, column=0, sticky="e", padx=10)
+        self.ao_name = ctk.CTkEntry(self.outer_frame, font=ctk.CTkFont(size=14))
+        self.ao_name.grid(row=1, column=1, padx=10, sticky="ew")
+        self.ao_name.insert(0, "Kisodori Shiho")
+
+        ctk.CTkLabel(
+            self.outer_frame, text="Team AKA:",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=self.theme["fg"], fg_color=self.theme["bg"]
+        ).grid(row=1, column=3, sticky="e", padx=10)
+        self.aka_name = ctk.CTkEntry(self.outer_frame, font=ctk.CTkFont(size=14))
+        self.aka_name.grid(row=1, column=4, padx=10, sticky="ew")
+        self.aka_name.insert(0, "Keneth")
+
+        self.outer_frame.grid_columnconfigure(1, weight=1)
+        self.outer_frame.grid_columnconfigure(4, weight=1)
+        self.outer_frame.grid_rowconfigure(2, weight=1)
+
+        self.ao_frame = ctk.CTkFrame(self.outer_frame, fg_color=self.theme["ao_bg"], corner_radius=12)
+        self.ao_frame.grid(row=2, column=0, columnspan=2, pady=10, sticky="nsew")
+        self.ao_score_label = ctk.CTkLabel(
+            self.ao_frame, text="0", font=ctk.CTkFont(size=48, weight="bold"),
+            text_color="white", fg_color=self.theme["ao_bg"]
+        )
+        self.ao_score_label.pack(pady=(0, 15), fill="x")
+        btn_ao_frame = ctk.CTkFrame(self.ao_frame, fg_color=self.theme["ao_bg"])
+        btn_ao_frame.pack()
+        ctk.CTkButton(btn_ao_frame, text="+1", width=60, height=40, font=ctk.CTkFont(size=18, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.add_ao).pack(side="left", padx=8)
+        ctk.CTkButton(btn_ao_frame, text="-1", width=60, height=40, font=ctk.CTkFont(size=18, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.sub_ao).pack(side="left", padx=8)
+
+        self.aka_frame = ctk.CTkFrame(self.outer_frame, fg_color=self.theme["aka_bg"], corner_radius=12)
+        self.aka_frame.grid(row=2, column=3, columnspan=2, pady=10, sticky="nsew")
+        self.aka_score_label = ctk.CTkLabel(
+            self.aka_frame, text="0", font=ctk.CTkFont(size=48, weight="bold"),
+            text_color="white", fg_color=self.theme["aka_bg"]
+        )
+        self.aka_score_label.pack(pady=(0, 15), fill="x")
+        btn_aka_frame = ctk.CTkFrame(self.aka_frame, fg_color=self.theme["aka_bg"])
+        btn_aka_frame.pack()
+        ctk.CTkButton(btn_aka_frame, text="+1", width=60, height=40, font=ctk.CTkFont(size=18, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.add_aka).pack(side="left", padx=8)
+        ctk.CTkButton(btn_aka_frame, text="-1", width=60, height=40, font=ctk.CTkFont(size=18, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.sub_aka).pack(side="left", padx=8)
+
+        self.timer_label = ctk.CTkLabel(
+            self.outer_frame, text="0:10", font=ctk.CTkFont(size=36, weight="bold"),
+            fg_color=self.theme["timer_bg"], text_color=self.theme["timer_fg"], corner_radius=8, width=220, height=60
+        )
+        self.timer_label.grid(row=3, column=0, columnspan=5, pady=20, sticky="ew")
+
+        btn_frame = ctk.CTkFrame(self.outer_frame, fg_color=self.theme["bg"])
+        btn_frame.grid(row=4, column=0, columnspan=5, pady=(0, 10))
+        ctk.CTkButton(btn_frame, text="Start", width=80, height=36, font=ctk.CTkFont(size=14, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.start_timer).pack(side="left", padx=10)
+        ctk.CTkButton(btn_frame, text="Stop", width=80, height=36, font=ctk.CTkFont(size=14, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.stop_timer).pack(side="left", padx=10)
+        ctk.CTkButton(btn_frame, text="Reset", width=80, height=36, font=ctk.CTkFont(size=14, weight="bold"),
+                      fg_color=self.theme["btn_bg"], text_color=self.theme["btn_fg"], hover_color=self.theme["btn_active_bg"],
+                      command=self.reset_timer).pack(side="left", padx=10)
+
+        nav_frame = ctk.CTkFrame(self.outer_frame, fg_color=self.theme["bg"])
+        nav_frame.grid(row=5, column=0, columnspan=5, pady=10)
+        ctk.CTkButton(nav_frame, text="Back", width=120, height=40, font=ctk.CTkFont(size=16, weight="bold"),
+                      fg_color="#b5d0e6", text_color="#0b355d", command=self.back_to_studylog).pack(side="left", padx=10)
+        ctk.CTkButton(nav_frame, text="Quit", width=120, height=40, font=ctk.CTkFont(size=16, weight="bold"),
+                      fg_color="#d9534f", text_color="white", command=self.quit_app).pack(side="left", padx=10)
+
+    def update_timer(self):
+        if self.timer_running and self.time_left > 0:
+            self.time_left -= 1
+            minutes = self.time_left // 60
+            seconds = self.time_left % 60
+            self.timer_label.configure(text=f"{minutes}:{seconds:02d}")
+            self.after(1000, self.update_timer)
+        elif self.time_left == 0:
+            self.timer_running = False
+            messagebox.showinfo("Timer", "Time's up!")
+
+    def start_timer(self):
+        if not self.timer_running:
+            self.timer_running = True
+            self.update_timer()
+
+    def stop_timer(self):
+        self.timer_running = False
+
+    def reset_timer(self):
+        self.stop_timer()
+        self.time_left = 10
+        self.timer_label.configure(text="0:10")
+
+    def add_ao(self):
+        self.ao_score += 1
+        self.ao_score_label.configure(text=str(self.ao_score))
+
+    def sub_ao(self):
+        self.ao_score = max(0, self.ao_score - 1)
+        self.ao_score_label.configure(text=str(self.ao_score))
+
+    def add_aka(self):
+        self.aka_score += 1
+        self.aka_score_label.configure(text=str(self.aka_score))
+
+    def sub_aka(self):
+        self.aka_score = max(0, self.aka_score - 1)
+        self.aka_score_label.configure(text=str(self.aka_score))
+
+    def back_to_studylog(self):
+        self.pack_forget()
+        if self.controller:
+            self.controller.create_welcome_page()
+
+    def quit_app(self):
+        self.master.destroy()
+
+if __name__ == "__main__":
+    root = ctk.CTk()
+    app = ScoreboardApp(root)
+    app.mainloop()
